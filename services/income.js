@@ -50,8 +50,11 @@ async function getAllIncomeService(params) {
   if (minAmount) {
     queryObject.total = { $gte: minAmount };
   }
-
-  let results = Income.find({ ownedBy: user_id, ...queryObject });
+  console.log(typeof user_id, user_id);
+  
+  let results = Income.find({ ...queryObject, ownedBy: user_id });
+  // console.log(results);
+  
 
   if (sort) {
     const sortList = sort.split(',').join(' ');

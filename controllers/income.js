@@ -7,11 +7,13 @@ const {
   deleteIncomeService
 } = require('../services/income')
 
-const getAllIncome = async (req, res) => {
+const getAllIncomes = async (req, res) => {
   const { user_id } = req.params
   const params = { ...req.query, user_id }
-  const userIncome = await getAllIncomeService(params)
-  res.status(StatusCodes.OK).json({ nbHit: userIncome.length, userIncome })
+  
+  const userIncomes = await getAllIncomeService(params)
+  
+  res.status(StatusCodes.OK).json({ nbHit: userIncomes.length, userIncomes })
 }
 
 const getSingleIncome = async (req, res) => {
@@ -48,7 +50,7 @@ const deleteIncome = async (req, res) => {
 }
 
 module.exports = {
-  getAllIncome,
+  getAllIncomes,
   getSingleIncome,
   createIncome,
   updateIncome,

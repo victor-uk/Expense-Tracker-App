@@ -7,7 +7,7 @@ const BudgetSchema = new Schema({
   },
   month: {
     type: String,
-    match: [/^\d{4}-\d{2}$/, "Invalid input"],
+    match: [/^(0?[1-9]|1[0-2])-\d{4}$/, `Invalid month format, input should be like ${new Date().getMonth()}-${new Date().getFullYear()}`],
     required: true,
     trim: true
   },

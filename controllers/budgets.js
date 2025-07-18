@@ -1,11 +1,9 @@
-// controllers/budgets.js
-
 const Budget = require('../models/budget')
 const { StatusCodes } = require('http-status-codes')
 
 const getAllBudgets = async (req, res) => {
   const { user_id } = req.params
-  const { month } = req.query``
+  const { month } = req.query
   const queryObject = {}
   if (month) {
     queryObject.month = month
