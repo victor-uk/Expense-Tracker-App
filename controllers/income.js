@@ -8,7 +8,7 @@ const {
 } = require('../services/income')
 
 const getAllIncomes = async (req, res) => {
-  const { user_id } = req.params
+  const { id: user_id } = req.user
   const params = { ...req.query, user_id }
   
   const userIncomes = await getAllIncomeService(params)
@@ -26,7 +26,7 @@ const getSingleIncome = async (req, res) => {
 }
 
 const createIncome = async (req, res) => {
-  const { user_id } = req.params
+  const { id: user_id } = req.user
   const income = await createIncomeService({ ...req.body, user_id })
   res.status(StatusCodes.OK).json({ success: true, data: income })
 }

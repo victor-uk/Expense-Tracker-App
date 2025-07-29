@@ -8,19 +8,20 @@ const UserSchema = new Schema({
         type: String,
         required: [true, "Please provide name"],
         trim: true,
-        maxLength: [15, "Name cannot exceed length"],
+        maxLength: [20, "Name cannot exceed length"],
         minLength: [2, "Name must exceed length"]
     },
     email: {
         type: String,
         required: [true, "Please provide email"],
         trim: true,
-        match: [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i, "Invalid email address"],
-        unique: true
+        match: [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i, "Invalid user credentials"],
+        unique: true,
+        lowercase: true
     },
     password: {
         type: String,
-        required: [true, "I don't need to tell you to provide your password innit"],
+        required: [true, "Invalid user credentials"],
     },
     income: {
         type: Number,

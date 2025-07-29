@@ -6,27 +6,44 @@ const { createCustomError } = require('../error/custom-error')
 const updateUserCategory = async (req, res) => {
   const { category } = req.body
   const { id } = req.params
-  const categories = await User.findByIdAndUpdate(
+  
+  // Validate category is not empty
+  if (!category || category.trim() === '') {
+    throw createCustomError('Provide a category', StatusCodes.BAD_REQUEST)
+  }
+  
+  const user = await User.findByIdAndUpdate(
     id,
-    { $addToSet: { categories: category } },
+    { $addToSet: { categories: category.trim() } },
     { new: true, runValidators: true }
   )
-  res.status(StatusCodes.OK).json({ categories })
+  if (!user) {
+    throw createCustomError('Not Found', StatusCodes.NOT_FOUND)
+  }
+
+  res.status(StatusCodes.OK).json({ categories: user.categories })
 }
 
 const deleteUserCategory = async (req, res) => {
   const { category } = req.body
   const { id } = req.params
 
-  const categories = await User.findByIdAndUpdate(
+  // Validate category is not empty
+  if (!category || category.trim() === '') {
+    throw createCustomError('Provide a category', StatusCodes.BAD_REQUEST)
+  }
+  
+  let field = `splitAllocation.${category.trim()}`
+  const user = await User.findByIdAndUpdate(
     id,
     { $pull: { categories: category } },
     { new: true, runValidators: true }
   )
-  if (!categories) {
-    throw createCustomError(ReasonPhrases.NOT_FOUND, StatusCodes.NOT_FOUND)
+  
+  if (!user) {
+    throw createCustomError('Not Found', StatusCodes.NOT_FOUND)
   }
-  let field = `splitAllocation.${category}`
+  
   const expensesWithCategory = await Expense.updateMany(
     { [field]: { $exists: true } },
     [
@@ -35,7 +52,10 @@ const deleteUserCategory = async (req, res) => {
     ]
   )
 
-  res.status(StatusCodes.OK).json({ categories, expensesWithCategory })
+  res.status(StatusCodes.OK).json({ 
+    categories: user.categories, 
+    expensesWithCategory 
+  })
 }
 
 module.exports = { updateUserCategory, deleteUserCategory }

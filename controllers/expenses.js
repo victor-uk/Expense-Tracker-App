@@ -3,7 +3,7 @@ const { StatusCodes } = require('http-status-codes')
 const { getAllExpensesService, createExpenseService, updateExpenseService } = require('../services/expenses')
 
 const getAllExpenses = async (req, res) => {
-  const { user_id } = req.params
+  const { id: user_id } = req.user
   const params = { ...req.query, user_id }
   const userExpenses = await getAllExpensesService(params)
   res.status(StatusCodes.OK).json({ nbHit: userExpenses.length, userExpenses })
@@ -19,14 +19,14 @@ const getSingleExpenses = async (req, res) => {
 }
 
 const createExpenses = async (req, res) => {
-  const { user_id } = req.params
+  const { id: user_id } = req.user
   const newExpense = await createExpenseService({ ...req.body, user_id })
   res.status(StatusCodes.OK).json({ newExpense })
 }
 
 const updateExpenses = async (req, res) => {
-  const { user_id, id } = req.params
-  const updatedExpense = await updateExpenseService(id, { ...req.body, user_id })
+  const { id: user_id } = req.user
+  const updatedExpense = await updateExpenseService(user_id, { ...req.body,  })
   if (!updatedExpense) {
     return res.status(StatusCodes.NOT_FOUND).json({ success: false, message: 'Expense not found' });
   }

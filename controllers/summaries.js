@@ -13,7 +13,7 @@ const getAllSummaries = async (req, res) => {
 }
 
 const getUserMonthlySummary = async (req, res) => {
-    const { user_id: userId } = req.params
+    const { id: userId } = req.user.user
     const { month } = req.query
     const monthlySummary = await Summary.findOne({ userId: userId, month: month})
     const hasBudget = await Budget.findOne({ createdBy: userId, month: month})

@@ -4,13 +4,13 @@ const Expense = require('../models/expenses');
 
 // Get all users
 const getAllUsers = async (req, res) => {
-  const users = await User.find();
+  const users = await User.find().select('-password');
   res.status(StatusCodes.OK).json({ success: true, data: users });
 };
 
 // Get a single user by ID
 const getSingleUser = async (req, res) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findById(req.params.id).select('-password');
   if (!user) {
     return res.status(StatusCodes.NOT_FOUND).json({ success: false, message: 'User not found' });
   }
@@ -22,7 +22,7 @@ const updateUser = async (req, res) => {
   const user = await User.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
-  });
+  }).select('-password');
   if (!user) {
     return res.status(StatusCodes.NOT_FOUND).json({ success: false, message: 'User not found' });
   }

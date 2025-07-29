@@ -68,6 +68,3 @@ ExpenseSchema.pre('validate', async function (next) {
 
 module.exports = model('Expense', ExpenseSchema)
 
-//   const keys = Array.from(splitAllocation.keys())
-//   const results = await Promise.all(keys.map(key => User.findOne({categories: key})))
-//   return results.every(result => result !== null)

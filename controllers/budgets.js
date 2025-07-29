@@ -1,20 +1,22 @@
-const Budget = require('../models/budget')
 const { StatusCodes } = require('http-status-codes')
+const {
+  getAllBudgetsService,
+  getSingleBudgetService,
+  createBudgetService,
+  updateBudgetService,
+  deleteBudgetService
+} = require('../services/budgets')
 
 const getAllBudgets = async (req, res) => {
-  const { user_id } = req.params
-  const { month } = req.query
-  const queryObject = {}
-  if (month) {
-    queryObject.month = month
-  }
-  const budgets = await Budget.find({ ...queryObject, createdBy: user_id}).sort('-createdAt')
+  const { id: user_id } = req.user.user
+  const params = { ...req.query, user_id }
+  const budgets = await getAllBudgetsService(params)
   res.status(StatusCodes.OK).json({ success: true, data: budgets })
 }
 
 const getSingleBudget = async (req, res) => {
   const { id } = req.params
-  const budget = await Budget.findById(id)
+  const budget = await getSingleBudgetService(id)
   if (!budget) {
     return res.status(StatusCodes.NOT_FOUND).json({ success: false, message: 'Budget not found' })
   }
@@ -22,14 +24,14 @@ const getSingleBudget = async (req, res) => {
 }
 
 const createBudget = async (req, res) => {
-  const { user_id } = req.params
-  const budget = await Budget.create({...req.body, createdBy: user_id})
+  const { id: user_id } = req.user.user
+  const budget = await createBudgetService({ ...req.body, user_id })
   res.status(StatusCodes.CREATED).json({ success: true, data: budget })
 }
 
 const updateBudget = async (req, res) => {
   const { id } = req.params
-  const budget = await Budget.findByIdAndUpdate(id, req.body, { new: true, runValidators: true })
+  const budget = await updateBudgetService(id, req.body)
   if (!budget) {
     return res.status(StatusCodes.NOT_FOUND).json({ success: false, message: 'Budget not found' })
   }
@@ -38,7 +40,7 @@ const updateBudget = async (req, res) => {
 
 const deleteBudget = async (req, res) => {
   const { id } = req.params
-  const budget = await Budget.findByIdAndDelete(id)
+  const budget = await deleteBudgetService(id)
   if (!budget) {
     return res.status(StatusCodes.NOT_FOUND).json({ success: false, message: 'Budget not found' })
   }

@@ -9,11 +9,11 @@ const authenticateUser = async (req, res, next) => {
   const { email, password } = req.body
   const user = await User.findOne({ email: email })
   if (!user) {
-    throw createCustomError('Unknown email', StatusCodes.FORBIDDEN)
+    throw createCustomError('Invalid credentials', StatusCodes.FORBIDDEN)
   }
   const isMatch = await bcrypt.compare(password, user.password)
   if (!isMatch) {
-    throw createCustomError('Incorrect password', StatusCodes.FORBIDDEN) // Invalid credentials
+    throw createCustomError('Invalid credentials', StatusCodes.FORBIDDEN)
   }
   req.user = user
   next()

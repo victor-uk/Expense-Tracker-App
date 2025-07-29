@@ -6,7 +6,7 @@ const validateSignup = (req, res, next) => {
   const { name, email, password } = req.body
   if (!name || !email || !password) {
     throw createCustomError(
-      'Invalid Registration. Check name, password and email ',
+      'Invalid user credentials ',
       StatusCodes.BAD_REQUEST
     )
   }
@@ -23,13 +23,13 @@ const validateLogin = async (req, res, next) => {
   const { email, password } = req.body
   if (!email || !password) {
     throw createCustomError(
-      'Invalid login credentials',
+      'Invalid user credentials',
       StatusCodes.BAD_REQUEST
     )
   }
   if (password.length < 8 || password.length > 20) {
     throw createCustomError(
-      'Password length must be between 8 and 20 characters',
+      'Invalid user credentials',
       StatusCodes.BAD_REQUEST
     )
   } // Technically, not needed

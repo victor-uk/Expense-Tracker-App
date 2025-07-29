@@ -1,77 +1,21 @@
 // services/expenses.js
 const Expense = require('../models/expenses')
-const { createCustomError } = require('../error/custom-error')
-const { StatusCodes } = require('http-status-codes')
-
+const { buildQueryObject, applyQueryOperations } = require('../utils/queryBuilder')
 
 async function getAllExpensesService (params) {
-  const {
-    search,
-    category,
-    total,
-    startDate,
-    endDate,
-    sort,
-    field,
-    limit,
-    page,
-    maxAmount,
-    minAmount,
-    user_id
-  } = params
+  const { user_id, ...queryParams } = params
 
-  const queryObject = {}
-  if (search) {
-    queryObject.$or = [
-      { description: { $regex: search, $options: 'i' } },
-      { productDetails: { $regex: search, $options: 'i' } }
-    ]
-  }
-  if (category) {
-    queryObject[`splitAllocation.${category}`] = { $exists: true }
-  }
-  if (total) {
-    queryObject.total = total
-  }
-  if (startDate && endDate) {
-    if (startDate < 0 || endDate) {
-      throw createCustomError('Invalid time value', StatusCodes.BAD_REQUEST)
-    }
-    queryObject.$and = [{}]
-  }
-  if (maxAmount && minAmount) {
-    queryObject.$and = [
-      { total: { $gte: minAmount } },
-      { total: { $lte: maxAmount } }
-    ]
-  }
-  if (maxAmount) {
-    queryObject.total = { $lte: maxAmount }
-  }
-  if (minAmount) {
-    queryObject.total = { $gte: minAmount }
-  }
+  // Build query object using utility
+  const queryObject = buildQueryObject({
+    ...queryParams,
+    isExpense: true
+  })
 
+  // Create base query
   let results = Expense.find({ spentBy: user_id, ...queryObject })
 
-  if (sort) {
-    const sortList = sort.split(',').join(' ')
-    results = results.sort(sortList)
-  } else {
-    results = results.sort('-createdAt')
-  }
-  if (field) {
-    const fieldList = field.split(',').join(' ')
-    results = results.select(fieldList)
-  }
-  if (limit) {
-    results = results.limit(Number(limit))
-  }
-  if (page) {
-    let numPerPage = limit || 10
-    let pages = numPerPage * (Number(page) - 1)
-    results = results.skip(pages).limit(numPerPage)
-  }
+  // Apply query operations using utility
+  results = applyQueryOperations(results, queryParams)
 
   return await results
 }
@@ -97,22 +41,20 @@ async function updateExpenseService (id, data) {
     (acc, key) => acc + key,
     0
   )
-  const updateData = {
+  const updatedData = {
     description,
     productDetails,
+    productDetails,
     splitAllocation,
-    total,
-    spentBy: user_id
+    spentBy: user_id,
+    total
   }
-  return await Expense.findByIdAndUpdate(id, updateData, {
-    new: true,
-    runValidators: true
-  })
+  return await Expense.findByIdAndUpdate(id, updatedData, { new: true, runValidators: true })
 }
-
-module.exports = {
-  getAllExpensesService,
-  createExpenseService,
-  updateExpenseService
-}
+  
+  module.exports = {
+    getAllExpensesService,
+    createExpenseService,
+    updateExpenseService
+  }
 
